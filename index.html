@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Générateur Aléatoire</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-color: #0f172a; /* dark slate */
+      color: #f1f5f9; /* light slate */
+    }
+    .fade {
+      animation: fade 0.4s ease-in-out;
+    }
+    @keyframes fade {
+      0% { opacity: 0; transform: scale(0.5); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen px-4">
+  <div class="max-w-md w-full bg-gray-800 rounded-2xl p-6 shadow-xl">
+    <h1 class="text-2xl font-bold mb-6 text-center">🎲 Générateur Aléatoire</h1>
+    <div class="mb-4">
+      <label class="block mb-1">Nombre minimum</label>
+      <input id="min" type="number" class="w-full p-2 rounded bg-gray-700 text-white outline-none" placeholder="ex: 1" />
+    </div>
+    <div class="mb-4">
+      <label class="block mb-1">Nombre maximum</label>
+      <input id="max" type="number" class="w-full p-2 rounded bg-gray-700 text-white outline-none" placeholder="ex: 100" />
+    </div>
+    <button id="generateBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded transition">
+      Générer
+    </button>
+    <div id="result" class="text-center text-4xl font-bold mt-6 fade"></div>
+  </div>
+
+  <script>
+    const btn = document.getElementById("generateBtn");
+    const resultDiv = document.getElementById("result");
+
+    btn.addEventListener("click", () => {
+      const min = parseInt(document.getElementById("min").value);
+      const max = parseInt(document.getElementById("max").value);
+
+      if (isNaN(min) || isNaN(max) || min >= max) {
+        resultDiv.innerHTML = "⛔ Valeurs incorrectes.";
+        return;
+      }
+
+      const random = Math.floor(Math.random() * (max - min + 1)) + min;
+
+      resultDiv.classList.remove("fade"); // reset animation
+      void resultDiv.offsetWidth; // reflow
+      resultDiv.classList.add("fade"); // re-trigger animation
+
+      resultDiv.innerHTML = `${random}`;
+    });
+  </script>
+</body>
+</html>
