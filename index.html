@@ -7,8 +7,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
-      background-color: #0f172a; /* dark slate */
-      color: #f1f5f9; /* light slate */
+      background-color: #0f172a;
+      color: #f1f5f9;
     }
     .fade {
       animation: fade 0.4s ease-in-out;
@@ -17,10 +17,17 @@
       0% { opacity: 0; transform: scale(0.5); }
       100% { opacity: 1; transform: scale(1); }
     }
+    .segment {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 20%;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body class="flex items-center justify-center min-h-screen px-4">
-  <div class="max-w-md w-full bg-gray-800 rounded-2xl p-6 shadow-xl">
+  <div class="max-w-md w-full bg-gray-800 rounded-2xl p-6 shadow-xl relative">
     <h1 class="text-2xl font-bold mb-6 text-center">🎲 Générateur Aléatoire</h1>
     <div class="mb-4">
       <label class="block mb-1">Nombre minimum</label>
@@ -30,32 +37,46 @@
       <label class="block mb-1">Nombre maximum</label>
       <input id="max" type="number" class="w-full p-2 rounded bg-gray-700 text-white outline-none" placeholder="ex: 100" />
     </div>
-    <button id="generateBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded transition">
+
+    <div class="relative w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded transition text-center select-none">
       Générer
-    </button>
+      <!-- Zones invisibles cliquables -->
+      <div class="segment left-0" data-bias="0.1" style="left:0%"></div>
+      <div class="segment" data-bias="0.25" style="left:20%"></div>
+      <div class="segment" data-bias="0.5" style="left:40%"></div>
+      <div class="segment" data-bias="0.75" style="left:60%"></div>
+      <div class="segment" data-bias="0.9" style="left:80%"></div>
+    </div>
+
     <div id="result" class="text-center text-4xl font-bold mt-6 fade"></div>
   </div>
 
   <script>
-    const btn = document.getElementById("generateBtn");
+    const segments = document.querySelectorAll(".segment");
     const resultDiv = document.getElementById("result");
 
-    btn.addEventListener("click", () => {
-      const min = parseInt(document.getElementById("min").value);
-      const max = parseInt(document.getElementById("max").value);
+    segments.forEach(segment => {
+      segment.addEventListener("click", () => {
+        const min = parseInt(document.getElementById("min").value);
+        const max = parseInt(document.getElementById("max").value);
+        const bias = parseFloat(segment.dataset.bias);
 
-      if (isNaN(min) || isNaN(max) || min >= max) {
-        resultDiv.innerHTML = "⛔ Valeurs incorrectes.";
-        return;
-      }
+        if (isNaN(min) || isNaN(max) || min >= max) {
+          resultDiv.innerHTML = "⛔ Valeurs incorrectes.";
+          return;
+        }
 
-      const random = Math.floor(Math.random() * (max - min + 1)) + min;
+        // Génération biaisée
+        const range = max - min;
+        const jitter = Math.random() * (range * 0.2) - (range * 0.1); // ±10% de bruit
+        let biased = Math.floor(min + bias * range + jitter);
+        biased = Math.max(min, Math.min(max, biased)); // clamp
 
-      resultDiv.classList.remove("fade"); // reset animation
-      void resultDiv.offsetWidth; // reflow
-      resultDiv.classList.add("fade"); // re-trigger animation
-
-      resultDiv.innerHTML = `${random}`;
+        resultDiv.classList.remove("fade");
+        void resultDiv.offsetWidth;
+        resultDiv.classList.add("fade");
+        resultDiv.innerHTML = biased;
+      });
     });
   </script>
 </body>
